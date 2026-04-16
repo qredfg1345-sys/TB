@@ -2,207 +2,241 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Train Reservation System | Role-Based Access</title>
+    <title>Train Reservation System | Professional Simulation</title>
     <style>
-        :root { --admin-primary: #2c3e50; --staff-primary: #27ae60; --bg: #f0f2f5; }
+        :root { --admin-color: #2c3e50; --staff-color: #27ae60; --error: #e74c3c; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 90%; max-width: 1100px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; display: none; min-height: 600px; }
+        .app-container { width: 95%; max-width: 1100px; background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); overflow: hidden; display: none; min-height: 650px; }
         
-        /* Login Screen */
-        #login-screen { text-align: center; background: white; padding: 50px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 400px; }
-        .role-card { padding: 20px; margin: 15px 0; border: 2px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.3s; }
-        .role-card:hover { border-color: var(--admin-primary); background: #f8f9fa; }
+        /* Login Styling */
+        #login-screen { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        .login-field { margin-bottom: 15px; text-align: left; }
+        input, select, button { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: var(--admin-color); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { opacity: 0.9; }
         
-        /* Header & Sidebar */
-        .sidebar { width: 250px; background: var(--admin-primary); color: white; padding: 20px; flex-shrink: 0; }
-        .main-content { flex-grow: 1; padding: 30px; position: relative; }
-        .nav-item { padding: 12px; margin: 5px 0; border-radius: 5px; cursor: pointer; transition: 0.2s; }
-        .nav-item:hover { background: rgba(255,255,255,0.1); }
-        
-        /* Use Case Sections */
+        /* Layout */
+        .sidebar { width: 260px; background: var(--admin-color); color: white; padding: 25px; flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; position: relative; overflow-y: auto; }
+        .nav-item { padding: 12px 15px; margin: 8px 0; border-radius: 6px; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.05); }
+        .nav-item:hover { background: rgba(255,255,255,0.15); }
+        .logout-btn { background: #e74c3c; width: auto; padding: 8px 15px; position: absolute; top: 20px; right: 20px; }
+
+        /* UI Elements */
         .uc-section { display: none; }
-        .uc-section.active { display: block; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
-        button { background: var(--admin-primary); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .logout-btn { position: absolute; top: 20px; right: 20px; background: #e74c3c; width: auto; padding: 8px 15px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
+        .active { display: block; }
+        .data-card { background: #f8f9fa; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; font-size: 14px; }
+        th { background: #f1f1f1; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <h2>Train Management System</h2>
-    <p>Please select your role to login </p>
-    <div class="role-card" onclick="login('admin')">
-        <h3>System Administrator</h3>
-        <small>Manage Fleet, Routes, and Schedules</small>
+    <h2 style="margin-bottom: 5px;">Train System</h2>
+    <p style="color: #666; font-size: 14px; margin-bottom: 25px;">Enter credentials to access portal</p>
+    
+    <div class="login-field">
+        <label>Role</label>
+        <select id="login-role">
+            <option value="admin">System Administrator</option>
+            <option value="staff">Staff Member</option>
+        </select>
     </div>
-    <div class="role-card" onclick="login('staff')">
-        <h3>Staff / Reservation Officer</h3>
-        <small>Handle Passengers, Tickets, and Checkings</small>
+    <div class="login-field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="e.g., admin01">
+    </div>
+    <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••">
+    </div>
+    <button onclick="handleLogin()" style="margin-top: 10px;">Login</button>
+    <p id="login-error" style="color: var(--error); font-size: 12px; margin-top: 10px; display: none;">Invalid Username or Password</p>
+    
+    <div style="margin-top: 20px; font-size: 11px; color: #999; border-top: 1px solid #eee; padding-top: 10px;">
+        Demo - Admin: <b>admin / admin123</b><br>
+        Demo - Staff: <b>staff / staff123</b>
     </div>
 </div>
 
 <div id="app" class="app-container">
     <div id="sidebar" class="sidebar">
-        <h2 id="role-title">Admin Portal</h2>
-        <div id="admin-menu">
-            <div class="nav-item" onclick="showUC('uc-trains')">Manage Trains (UC 1-3)</div>
-            <div class="nav-item" onclick="showUC('uc-routes')">Configure Routes (UC 4-6)</div>
-            <div class="nav-item" onclick="showUC('uc-schedules')">System Scheduling (UC 7-10)</div>
-        </div>
-        <div id="staff-menu" style="display:none;">
-            <div class="nav-item" onclick="showUC('uc-passengers')">Passenger Profiles (UC 11-13)</div>
-            <div class="nav-item" onclick="showUC('uc-ticketing')">Ticket Operations (UC 14-20)</div>
-        </div>
+        <h3 id="display-role">Portal</h3>
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+        <div id="menu-container"></div>
     </div>
 
     <div class="main-content">
         <button class="logout-btn" onclick="logout()">Logout</button>
         
-        <div id="uc-trains" class="uc-section">
-            <h3>[UC: Add/Update/Delete Train]</h3>
-            <input type="text" id="t_id" placeholder="Train ID">
-            <input type="text" id="t_type" placeholder="Train Type">
-            <button onclick="saveTrain()">Save Train [cite: 3]</button>
-            <table id="trainTable"><thead><tr><th>ID</th><th>Type</th></tr></thead><tbody></tbody></table>
+        <div id="sec-trains" class="uc-section">
+            <h3>[UC: Manage Trains]</h3>
+            <div class="data-card">
+                <input type="text" id="t_id" placeholder="Train ID">
+                <input type="text" id="t_type" placeholder="Train Type">
+                <button onclick="addTrain()">Add Train</button>
+            </div>
+            <table><thead><tr><th>Train ID</th><th>Type</th></tr></thead><tbody id="trainBody"></tbody></table>
         </div>
 
-        <div id="uc-routes" class="uc-section">
-            <h3>[UC: Define/Update/Delete Route] [cite: 6]</h3>
-            <input type="text" id="r_name" placeholder="Station A - Station B">
-            <button onclick="saveRoute()">Define Route [cite: 6]</button>
-            <ul id="routeList"></ul>
+        <div id="sec-schedules" class="uc-section">
+            <h3>[UC: Create Schedule]</h3>
+            <div class="data-card">
+                <select id="s_train"></select>
+                <input type="text" id="s_route" placeholder="Route (Source - Dest)">
+                <input type="datetime-local" id="s_time">
+                <input type="number" id="s_seats" placeholder="Capacity">
+                <button onclick="addSchedule()">Create Trip</button>
+            </div>
+            <table><thead><tr><th>Trip</th><th>Time</th><th>Seats</th></tr></thead><tbody id="scheduleBody"></tbody></table>
         </div>
 
-        <div id="uc-schedules" class="uc-section">
-            <h3>[UC: Manage Schedule] [cite: 7]</h3>
-            <select id="s_train"><option>Select Train</option></select>
-            <select id="s_route"><option>Select Route</option></select>
-            <input type="datetime-local" id="s_time">
-            <input type="number" id="s_seats" placeholder="Seats Count">
-            <button onclick="saveSchedule()">Create Schedule [cite: 25]</button>
+        <div id="sec-ticketing" class="uc-section">
+            <h3>[UC: Issue Ticket]</h3>
+            <div class="data-card">
+                <input type="text" id="p_name" placeholder="Passenger Name">
+                <select id="tick_s"></select>
+                <button onclick="buyTicket()" style="background:var(--staff-color)">Issue & Print Ticket</button>
+            </div>
+            <h4>Active Tickets</h4>
+            <div id="ticketList"></div>
         </div>
 
-        <div id="uc-passengers" class="uc-section">
-            <h3>[UC: Create Profile & Validate ID] [cite: 10, 13]</h3>
-            <input type="text" id="p_name" placeholder="Passenger Full Name">
-            <input type="text" id="p_id" placeholder="National ID">
-            <button onclick="savePassenger()" style="background:var(--staff-primary)">Register Passenger [cite: 12]</button>
-        </div>
-
-        <div id="uc-ticketing" class="uc-section">
-            <h3>[UC: Issue Ticket & Check Availability] [cite: 26, 15]</h3>
-            <select id="tick_p"><option>Select Passenger</option></select>
-            <select id="tick_s"><option>Select Trip</option></select>
-            <button onclick="issueTicket()" style="background:var(--staff-primary)">Confirm Ticket Issue [cite: 26]</button>
-            <button onclick="generateReport()" style="background:#34495e; margin-top:50px;">Generate Reports [cite: 9]</button>
+        <div id="sec-reports" class="uc-section">
+            <h3>[UC: Generate Reports]</h3>
+            <div class="data-card" id="reportArea"></div>
+            <button onclick="generateStats()" style="background:#34495e">Refresh Report</button>
         </div>
     </div>
 </div>
 
 <script>
-    let db = {
-        trains: JSON.parse(localStorage.getItem('tr')) || [],
-        routes: JSON.parse(localStorage.getItem('ro')) || [],
-        schedules: JSON.parse(localStorage.getItem('sc')) || [],
-        passengers: JSON.parse(localStorage.getItem('pa')) || [],
-        tickets: JSON.parse(localStorage.getItem('ti')) || []
+    // 1. DATA INITIALIZATION (Simulation of Database with Dummy Data)
+    const DUMMY_DATA = {
+        trains: [{id: 'EX-501', type: 'Bullet'}, {id: 'L-20', type: 'Local'}],
+        schedules: [
+            {id: 1, train: 'EX-501', route: 'Riyadh - Dammam', time: '2026-05-01T10:00', seats: 45},
+            {id: 2, train: 'L-20', route: 'Jeddah - Makkah', time: '2026-05-01T14:30', seats: 12}
+        ],
+        passengers: [],
+        tickets: []
     };
 
-    function login(role) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'flex';
-        
-        if(role === 'admin') {
-            document.getElementById('role-title').innerText = "Admin Portal";
-            document.getElementById('admin-menu').style.display = 'block';
-            document.getElementById('staff-menu').style.display = 'none';
-            document.getElementById('sidebar').style.background = '#2c3e50';
-            showUC('uc-trains');
+    let db = JSON.parse(localStorage.getItem('train_db')) || DUMMY_DATA;
+
+    // 2. AUTHENTICATION (UC: Login)
+    function handleLogin() {
+        const role = document.getElementById('login-role').value;
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+
+        // Simple validation logic
+        if ((role === 'admin' && user === 'admin' && pass === 'admin123') || 
+            (role === 'staff' && user === 'staff' && pass === 'staff123')) {
+            
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            setupUI(role);
         } else {
-            document.getElementById('role-title').innerText = "Staff Portal";
-            document.getElementById('admin-menu').style.display = 'none';
-            document.getElementById('staff-menu').style.display = 'block';
-            document.getElementById('sidebar').style.background = '#27ae60';
-            showUC('uc-passengers');
+            document.getElementById('login-error').style.display = 'block';
         }
-        refreshUI();
     }
 
     function logout() {
-        document.getElementById('app').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'block';
+        location.reload(); // Hard reset for security
     }
 
-    function showUC(id) {
+    // 3. UI SETUP
+    function setupUI(role) {
+        const menu = document.getElementById('menu-container');
+        const sidebar = document.getElementById('sidebar');
+        menu.innerHTML = '';
+
+        if(role === 'admin') {
+            document.getElementById('display-role').innerText = "Administrator";
+            sidebar.style.background = '#2c3e50';
+            menu.innerHTML += `<div class="nav-item" onclick="show('sec-trains')">Manage Fleet</div>`;
+            menu.innerHTML += `<div class="nav-item" onclick="show('sec-schedules')">Route Schedules</div>`;
+            show('sec-trains');
+        } else {
+            document.getElementById('display-role').innerText = "Staff Member";
+            sidebar.style.background = '#27ae60';
+            menu.innerHTML += `<div class="nav-item" onclick="show('sec-ticketing')">Ticket Sales</div>`;
+            menu.innerHTML += `<div class="nav-item" onclick="show('sec-reports')">System Reports</div>`;
+            show('sec-ticketing');
+        }
+        refreshData();
+    }
+
+    function show(id) {
         document.querySelectorAll('.uc-section').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // --- LOGIC FUNCTIONS (Same as before but linked to role UI) ---
-    function saveTrain() {
-        let id = document.getElementById('t_id').value;
-        let type = document.getElementById('t_type').value;
+    // 4. CORE LOGIC (Use Cases)
+    function addTrain() {
+        const id = document.getElementById('t_id').value;
+        const type = document.getElementById('t_type').value;
         if(id && type) {
             db.trains.push({id, type});
-            sync();
-            alert("Train stored in system [cite: 3]");
+            saveAndRefresh();
         }
     }
 
-    function saveRoute() {
-        let name = document.getElementById('r_name').value;
-        if(name) { db.routes.push(name); sync(); alert("Route stored [cite: 6]"); }
-    }
-
-    function saveSchedule() {
-        let s = { train: document.getElementById('s_train').value, route: document.getElementById('s_route').value, time: document.getElementById('s_time').value, seats: parseInt(document.getElementById('s_seats').value), id: Date.now() };
+    function addSchedule() {
+        const s = {
+            id: Date.now(),
+            train: document.getElementById('s_train').value,
+            route: document.getElementById('s_route').value,
+            time: document.getElementById('s_time').value,
+            seats: parseInt(document.getElementById('s_seats').value)
+        };
         db.schedules.push(s);
-        sync();
-        alert("Schedule created [cite: 25]");
+        saveAndRefresh();
     }
 
-    function savePassenger() {
-        let id = document.getElementById('p_id').value;
-        if(id.length < 5) return alert("Validation Error: Invalid ID [cite: 13]");
-        db.passengers.push({name: document.getElementById('p_name').value, id: id});
-        sync();
-        alert("Passenger registered [cite: 12]");
-    }
+    function buyTicket() {
+        const sid = document.getElementById('tick_s').value;
+        const name = document.getElementById('p_name').value;
+        const sch = db.schedules.find(x => x.id == sid);
 
-    function issueTicket() {
-        let sid = document.getElementById('tick_s').value;
-        let sch = db.schedules.find(x => x.id == sid);
-        if(sch && sch.seats > 0) {
+        if(sch && sch.seats > 0 && name) {
             sch.seats--;
-            db.tickets.push({p: document.getElementById('tick_p').value, s: sid});
-            sync();
-            alert("Ticket issued successfully [cite: 26]");
-        } else { alert("Alternative Flow: No availability [cite: 26]"); }
+            db.tickets.push({passenger: name, route: sch.route, time: sch.time});
+            saveAndRefresh();
+            alert("Ticket issued successfully!");
+        } else {
+            alert("Check availability or name field!");
+        }
     }
 
-    function sync() {
-        localStorage.setItem('tr', JSON.stringify(db.trains));
-        localStorage.setItem('ro', JSON.stringify(db.routes));
-        localStorage.setItem('sc', JSON.stringify(db.schedules));
-        localStorage.setItem('pa', JSON.stringify(db.passengers));
-        localStorage.setItem('ti', JSON.stringify(db.tickets));
-        refreshUI();
+    function saveAndRefresh() {
+        localStorage.setItem('train_db', JSON.stringify(db));
+        refreshData();
     }
 
-    function refreshUI() {
-        document.querySelector('#trainTable tbody').innerHTML = db.trains.map(t => `<tr><td>${t.id}</td><td>${t.type}</td></tr>`).join('');
+    function refreshData() {
+        // Update Tables
+        document.getElementById('trainBody').innerHTML = db.trains.map(t => `<tr><td>${t.id}</td><td>${t.type}</td></tr>`).join('');
+        document.getElementById('scheduleBody').innerHTML = db.schedules.map(s => `<tr><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td></tr>`).join('');
+        
+        // Update Selectors
         document.getElementById('s_train').innerHTML = db.trains.map(t => `<option>${t.id}</option>`).join('');
-        document.getElementById('s_route').innerHTML = db.routes.map(r => `<option>${r}</option>`).join('');
-        document.getElementById('tick_p').innerHTML = db.passengers.map(p => `<option>${p.name}</option>`).join('');
-        document.getElementById('tick_s').innerHTML = db.schedules.map(s => `<option value="${s.id}">${s.route} (${s.time})</option>`).join('');
+        document.getElementById('tick_s').innerHTML = db.schedules.map(s => `<option value="${s.id}">${s.route} (${s.seats} left)</option>`).join('');
+        
+        // Update Ticket View
+        document.getElementById('ticketList').innerHTML = db.tickets.map(t => `<div class="data-card">🎟️ <b>${t.passenger}</b> - ${t.route}</div>`).join('');
+        generateStats();
     }
 
-    function generateReport() {
-        alert(`System Report[cite: 9]:\nTotal Passengers: ${db.passengers.length}\nTickets Issued: ${db.tickets.length}`);
+    function generateStats() {
+        document.getElementById('reportArea').innerHTML = `
+            <p>Total Registered Trains: <b>${db.trains.length}</b></p>
+            <p>Active Daily Trips: <b>${db.schedules.length}</b></p>
+            <p>Tickets Sold Today: <b>${db.tickets.length}</b></p>
+        `;
     }
 </script>
 </body>
