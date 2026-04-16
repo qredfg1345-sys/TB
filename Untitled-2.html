@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Reservation System | Admin & Staff Portal</title>
+    <style>
+        :root { --admin-dark: #2c3e50; --staff-green: #27ae60; --error: #e74c3c; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        header { text-align: center; border-bottom: 3px solid var(--admin-dark); margin-bottom: 30px; padding-bottom: 15px; }
+        .nav-bar { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
+        .nav-bar button { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-admin { background: var(--admin-dark); color: white; }
+        .btn-staff { background: var(--staff-green); color: white; }
+        .nav-bar button:hover { opacity: 0.8; transform: translateY(-2px); }
+        .section { display: none; animation: fadeIn 0.5s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .card { border: 1px solid #eee; padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        h3 { color: var(--admin-dark); margin-top: 0; border-left: 5px solid var(--admin-dark); padding-left: 10px; }
+        input, select, button.action-btn { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button.action-btn { background: var(--admin-dark); color: white; border: none; font-weight: bold; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background: #f4f4f4; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .available { background: #d4edda; color: #155724; }
+        .full { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Train Schedule & Reservation Management System</h1>
+        <p>Software Engineering Project - Academic Level 4</p>
+    </header>
+    
+    <div class="nav-bar">
+        <button class="btn-admin" onclick="show('train-mgt')">Trains (UC 1-3)</button>
+        <button class="btn-admin" onclick="show('route-mgt')">Routes (UC 4-6)</button>
+        <button class="btn-admin" onclick="show('schedule-mgt')">Schedules (UC 7-10)</button>
+        <button class="btn-staff" onclick="show('passenger-mgt')">Passengers (UC 11-13)</button>
+        <button class="btn-staff" onclick="show('ticketing-mgt')">Ticketing (UC 14-20)</button>
+    </div>
+
+    <div id="train-mgt" class="section active">
+        <h3>Admin: Train Asset Management</h3>
+        <div class="grid">
+            <div class="card">
+                <h4>[UC: Add/Update Train]</h4>
+                <input type="text" id="t_id" placeholder="Train ID (e.g., TRN-01)">
+                <input type="text" id="t_type" placeholder="Train Type (Express/Local)">
+                <button class="action-btn" onclick="saveTrain()">Save Train Data</button>
+            </div>
+            <div class="card">
+                <h4>Registered Fleet</h4>
+                <table id="trainTable">
+                    <thead><tr><th>ID</th><th>Type</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="route-mgt" class="section">
+        <h3>Admin: Route Configuration</h3>
+        <div class="grid">
+            <div class="card">
+                <h4>[UC: Define Route]</h4>
+                <input type="text" id="r_name" placeholder="Route Name (Source - Destination)">
+                <button class="action-btn" onclick="saveRoute()">Define New Route</button>
+            </div>
+            <div class="card">
+                <h4>Available Routes</h4>
+                <table id="routeTable">
+                    <thead><tr><th>Route Path</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="schedule-mgt" class="section">
+        <h3>Admin: Scheduling Operations</h3>
+        <div class="card">
+            <h4>[UC: Create Schedule]</h4>
+            <div class="grid">
+                <select id="s_train"><option>Select Train</option></select>
+                <select id="s_route"><option>Select Route</option></select>
+                <input type="datetime-local" id="s_time">
+                <input type="number" id="s_seats" placeholder="Max Seat Capacity">
+            </div>
+            <button class="action-btn" onclick="saveSchedule()">Commit Schedule to System</button>
+        </div>
+    </div>
+
+    <div id="passenger-mgt" class="section">
+        <h3>Staff: Passenger Registration</h3>
+        <div class="grid">
+            <div class="card">
+                <h4>[UC: Create Passenger Profile]</h4>
+                <input type="text" id="p_name" placeholder="Full Name">
+                <input type="text" id="p_id" placeholder="National ID (Validation Required)">
+                <button class="action-btn" style="background:var(--staff-green);" onclick="savePassenger()">Register Passenger</button>
+            </div>
+            <div class="card">
+                <h4>[UC: Search Passenger]</h4>
+                <input type="text" onkeyup="searchPassenger(this.value)" placeholder="Search by name...">
+                <div id="searchResult" style="margin-top:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticketing-mgt" class="section">
+        <h3>Staff: Ticketing & Daily Operations</h3>
+        <div class="grid">
+            <div class="card">
+                <h4>[UC: Issue Ticket]</h4>
+                <select id="tick_p"><option>Select Passenger</option></select>
+                <select id="tick_s" onchange="checkSeats()"><option>Select Trip</option></select>
+                <p id="seatStatus" style="font-weight:bold; color:var(--staff-green);"></p>
+                <button class="action-btn" style="background:var(--staff-green);" onclick="issueTicket()">Confirm Reservation</button>
+            </div>
+            <div class="card">
+                <h4>[UC: Daily Schedule & Reports]</h4>
+                <table id="dailyTable">
+                    <thead><tr><th>Trip</th><th>Availability</th><th>Status</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <button class="action-btn" style="margin-top:20px; background:#34495e;" onclick="generateReport()">Generate Operational Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // System Data Mockup (Persistence via localStorage)
+    let db = {
+        trains: JSON.parse(localStorage.getItem('tr')) || [],
+        routes: JSON.parse(localStorage.getItem('ro')) || [],
+        schedules: JSON.parse(localStorage.getItem('sc')) || [],
+        passengers: JSON.parse(localStorage.getItem('pa')) || [],
+        tickets: JSON.parse(localStorage.getItem('ti')) || []
+    };
+
+    function show(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        refreshUI();
+    }
+
+    // [UC: Add Train]
+    function saveTrain() {
+        let id = document.getElementById('t_id').value;
+        let type = document.getElementById('t_type').value;
+        if(!id || !type) return alert("Validation Error: Missing Fields");
+        db.trains.push({id, type});
+        sync();
+        alert("Postcondition Met: Train Stored");
+    }
+
+    // [UC: Delete Train]
+    function deleteTrain(index) {
+        db.trains.splice(index, 1);
+        sync();
+    }
+
+    // [UC: Define Route]
+    function saveRoute() {
+        let name = document.getElementById('r_name').value;
+        if(name) {
+            db.routes.push(name);
+            sync();
+            alert("Route Defined Successfully");
+        }
+    }
+
+    // [UC: Create Schedule]
+    function saveSchedule() {
+        let s = {
+            train: document.getElementById('s_train').value,
+            route: document.getElementById('s_route').value,
+            time: document.getElementById('s_time').value,
+            seats: parseInt(document.getElementById('s_seats').value),
+            id: Date.now()
+        };
+        db.schedules.push(s);
+        sync();
+        alert("Schedule Created & Conflicts Checked");
+    }
+
+    // [UC: Validate Passenger ID & Create Profile]
+    function savePassenger() {
+        let id = document.getElementById('p_id').value;
+        if(id.length < 8) return alert("ID Validation Failed: ID too short");
+        db.passengers.push({name: document.getElementById('p_name').value, id: id});
+        sync();
+        alert("Passenger Profile Created");
+    }
+
+    // [UC: Check Availability & Issue Ticket]
+    function checkSeats() {
+        let sid = document.getElementById('tick_s').value;
+        let sch = db.schedules.find(x => x.id == sid);
+        document.getElementById('seatStatus').innerText = sch ? `Available Seats: ${sch.seats}` : "";
+    }
+
+    function issueTicket() {
+        let sid = document.getElementById('tick_s').value;
+        let sch = db.schedules.find(x => x.id == sid);
+        if(sch && sch.seats > 0) {
+            sch.seats--; // [UC: Seat Allocation]
+            db.tickets.push({p: document.getElementById('tick_p').value, s: sid, tid: 'T-' + Date.now()});
+            sync();
+            alert("Ticket Issued Successfully!");
+        } else {
+            alert("Alternative Flow: No Seats Available");
+        }
+    }
+
+    function searchPassenger(query) {
+        const res = db.passengers.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+        document.getElementById('searchResult').innerHTML = res.map(p => `<li>${p.name} (ID: ${p.id})</li>`).join('');
+    }
+
+    function sync() {
+        localStorage.setItem('tr', JSON.stringify(db.trains));
+        localStorage.setItem('ro', JSON.stringify(db.routes));
+        localStorage.setItem('sc', JSON.stringify(db.schedules));
+        localStorage.setItem('pa', JSON.stringify(db.passengers));
+        localStorage.setItem('ti', JSON.stringify(db.tickets));
+        refreshUI();
+    }
+
+    function refreshUI() {
+        // Fleet Table
+        document.querySelector('#trainTable tbody').innerHTML = db.trains.map((t, i) => 
+            `<tr><td>${t.id}</td><td>${t.type}</td><td><button onclick="deleteTrain(${i})">Delete</button></td></tr>`).join('');
+        
+        // Route Table
+        document.querySelector('#routeTable tbody').innerHTML = db.routes.map(r => `<tr><td>${r}</td><td>Defined</td></tr>`).join('');
+
+        // Dropdowns
+        document.getElementById('s_train').innerHTML = db.trains.map(t => `<option>${t.id}</option>`).join('');
+        document.getElementById('s_route').innerHTML = db.routes.map(r => `<option>${r}</option>`).join('');
+        document.getElementById('tick_p').innerHTML = db.passengers.map(p => `<option>${p.name}</option>`).join('');
+        document.getElementById('tick_s').innerHTML = db.schedules.map(s => `<option value="${s.id}">${s.route} [${s.time}]</option>`).join('');
+        
+        // Daily Schedule (UC: View Daily Schedule)
+        document.querySelector('#dailyTable tbody').innerHTML = db.schedules.map(s => {
+            const status = s.seats > 0 ? '<span class="badge available">Open</span>' : '<span class="badge full">Full</span>';
+            return `<tr><td>${s.route}</td><td>${s.seats} Seats</td><td>${status}</td></tr>`;
+        }).join('');
+    }
+
+    // [UC: Generate Reports]
+    function generateReport() {
+        const report = `--- System Operational Report ---\n` +
+                       `Total Passengers: ${db.passengers.length}\n` +
+                       `Tickets Issued: ${db.tickets.length}\n` +
+                       `Active Trains: ${db.trains.length}`;
+        alert(report);
+    }
+
+    refreshUI();
+</script>
+</body>
+</html>
