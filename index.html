@@ -2,42 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Train System | Final Integrated 20 Use Cases</title>
+    <title>Train System | Admin Operations Report</title>
     <style>
         :root { --admin-bg: #1a252f; --staff-bg: #27ae60; --light-bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar & Navigation */
-        .sidebar { width: 280px; background: var(--admin-bg); color: white; display: flex; flex-direction: column; transition: 0.3s; }
-        .sidebar h2 { padding: 20px; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); margin: 0; text-align: center; }
+        .sidebar { width: 280px; background: var(--admin-bg); color: white; display: flex; flex-direction: column; }
+        .sidebar h2 { padding: 20px; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .menu-group { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .menu-title { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 1px; }
-        .nav-link { padding: 12px; cursor: pointer; border-radius: 5px; margin-bottom: 5px; transition: 0.2s; font-size: 14px; display: flex; align-items: center; }
+        .menu-title { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .nav-link { padding: 12px; cursor: pointer; border-radius: 5px; margin-bottom: 5px; transition: 0.2s; font-size: 14px; }
         .nav-link:hover { background: rgba(255,255,255,0.1); }
-        .nav-link.active { background: #3498db; color: white; }
-
-        /* Content Area */
+        .nav-link.active { background: #3498db; }
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
         .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: none; }
         .container.active { display: block; }
         .logout { position: absolute; top: 20px; right: 20px; background: #e74c3c; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; }
-        
-        /* Forms & Tables */
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { background: #34495e; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; }
+        button { background: #34495e; color: white; border: none; font-weight: bold; cursor: pointer; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #f8f9fa; color: #333; }
         .action-btn { width: auto; padding: 5px 10px; font-size: 11px; margin: 2px; }
         .upd-btn { background: #3498db; }
         .del-btn { background: #e74c3c; }
-        
-        /* Login Overlay */
         #login-overlay { position: fixed; inset: 0; background: #2c3e50; display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-
-        /* Report Cards */
+        .login-box { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; }
         .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
         .card { padding: 20px; border-radius: 10px; color: white; text-align: center; }
     </style>
@@ -46,7 +34,7 @@
 
 <div id="login-overlay">
     <div class="login-box">
-        <h2 style="color:#2c3e50">Train System Login</h2>
+        <h2>Train System Login</h2>
         <select id="role-select">
             <option value="admin">Administrator (UC-1)</option>
             <option value="staff">Staff Member</option>
@@ -54,34 +42,18 @@
         <input type="text" id="user" placeholder="Username">
         <input type="password" id="pass" placeholder="Password">
         <button onclick="handleLogin()">Access Portal</button>
-        <p style="font-size: 11px; color: #999; margin-top: 15px;">Admin: admin/admin | Staff: staff/staff</p>
     </div>
 </div>
 
 <div class="sidebar" id="sidebar" style="display:none;">
     <h2 id="portal-name">Portal</h2>
     <div id="admin-menu">
-        <div class="menu-group">
-            <span class="menu-title">Fleet Mgt</span>
-            <div class="nav-link active" onclick="show('sec-trains')">Trains (UC 2,3,4)</div>
-        </div>
-        <div class="menu-group">
-            <span class="menu-title">Route Mgt</span>
-            <div class="nav-link" onclick="show('sec-routes')">Routes (UC 5,6,7)</div>
-        </div>
-        <div class="menu-group">
-            <span class="menu-title">Operations</span>
-            <div class="nav-link" onclick="show('sec-schedules')">Schedules (UC 8,9,10,11)</div>
-            <div class="nav-link" onclick="show('sec-admin-reports')">Reports (UC-12)</div>
-        </div>
+        <div class="menu-group"><span class="menu-title">Fleet Mgt</span><div class="nav-link active" onclick="show('sec-trains')">Trains (UC 2,3,4)</div></div>
+        <div class="menu-group"><span class="menu-title">Route Mgt</span><div class="nav-link" onclick="show('sec-routes')">Routes (UC 5,6,7)</div></div>
+        <div class="menu-group"><span class="menu-title">Operations</span><div class="nav-link" onclick="show('sec-schedules')">Schedules (UC 8,9,10,11)</div><div class="nav-link" onclick="show('sec-admin-reports')">Reports (UC-12)</div></div>
     </div>
     <div id="staff-menu" style="display:none;">
-        <div class="menu-group">
-            <span class="menu-title">Staff</span>
-            <div class="nav-link" onclick="show('sec-passengers')">Passengers (UC 13,14,15)</div>
-            <div class="nav-link" onclick="show('sec-tickets')">Ticketing (UC 16-19)</div>
-            <div class="nav-link" onclick="show('sec-daily')">Daily View (UC-20)</div>
-        </div>
+        <div class="menu-group"><span class="menu-title">Staff</span><div class="nav-link" onclick="show('sec-passengers')">Passengers (UC 13,14,15)</div><div class="nav-link" onclick="show('sec-tickets')">Ticketing (UC 16-19)</div><div class="nav-link" onclick="show('sec-daily')">Daily View (UC-20)</div></div>
     </div>
 </div>
 
@@ -89,7 +61,7 @@
     <button class="logout" onclick="location.reload()">Logout</button>
 
     <section id="sec-trains" class="container active">
-        <h3>Train Management (Add/Update/Delete) [cite: 3, 18, 19]</h3>
+        <h3>Train Management</h3>
         <input type="text" id="train_id" placeholder="Train ID">
         <input type="text" id="train_type" placeholder="Train Type">
         <button onclick="addUpdateTrain()">Save Train Asset (UC 2/3)</button>
@@ -97,15 +69,15 @@
     </section>
 
     <section id="sec-routes" class="container">
-        <h3>Route Configuration (Define/Update/Delete) [cite: 6, 20, 21]</h3>
+        <h3>Route Configuration</h3>
         <input type="hidden" id="edit_route_idx" value="-1">
-        <input type="text" id="route_path" placeholder="Route Path (e.g. Riyadh-Dammam)">
+        <input type="text" id="route_path" placeholder="Route Path">
         <button onclick="addUpdateRoute()">Save Route (UC 5/6)</button>
         <table id="routeList"><thead><tr><th>Route Path</th><th>Actions</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-schedules" class="container">
-        <h3>Schedule Operations (Create/Update/Delete) [cite: 7, 23, 24, 25]</h3>
+        <h3>Schedule Operations</h3>
         <input type="hidden" id="edit_sch_id" value="-1">
         <select id="sch_train"></select>
         <select id="sch_route"></select>
@@ -116,37 +88,37 @@
     </section>
 
     <section id="sec-admin-reports" class="container">
-        <h3>System Operational Reports (UC-12) </h3>
+        <h3>System Operational Reports (UC-12)</h3>
         <div id="report-content"></div>
     </section>
 
     <section id="sec-passengers" class="container">
-        <h3>Passenger Registry (UC 13,14,15) [cite: 10, 13, 29]</h3>
+        <h3>Passenger Registry</h3>
         <input type="text" id="ps_name" placeholder="Name">
-        <input type="text" id="ps_id" placeholder="ID (Min 5 digits)">
-        <button onclick="savePassenger()" style="background:var(--staff-bg)">Create Profile (UC-13)</button>
+        <input type="text" id="ps_id" placeholder="ID">
+        <button onclick="savePassenger()" style="background:var(--staff-bg)">Create Profile</button>
         <hr>
-        <input type="text" id="ps_search" onkeyup="searchPS()" placeholder="Search by Name or ID (UC-15)...">
+        <input type="text" id="ps_search" onkeyup="searchPS()" placeholder="Search...">
         <table id="psList"><thead><tr><th>Name</th><th>ID</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-tickets" class="container">
-        <h3>Ticketing & Seat Allocation (UC 16-19) [cite: 14, 15, 26, 28]</h3>
+        <h3>Ticketing</h3>
         <select id="tk_passenger"></select>
         <select id="tk_trip" onchange="checkAvail()"></select>
-        <div id="avail_info" style="font-weight:bold; color:var(--staff-bg); padding:10px;"></div>
-        <button onclick="issueTicket()" style="background:var(--staff-bg)">Issue Ticket (UC-18)</button>
+        <div id="avail_info"></div>
+        <button onclick="issueTicket()" style="background:var(--staff-bg)">Issue Ticket</button>
         <table id="tkTable"><thead><tr><th>Passenger</th><th>Trip</th><th>Actions</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-daily" class="container">
-        <h3>Daily Schedule View (UC-20) [cite: 16]</h3>
-        <table id="dailyView"><thead><tr><th>Trip</th><th>Time</th><th>Seats Available</th></tr></thead><tbody></tbody></table>
+        <h3>Daily Schedule View</h3>
+        <table id="dailyView"><thead><tr><th>Trip</th><th>Time</th><th>Seats</th></tr></thead><tbody></tbody></table>
     </section>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('train_final_system_db')) || {
+    let db = JSON.parse(localStorage.getItem('train_final_db')) || {
         trains: [], routes: [], schedules: [], passengers: [], tickets: []
     };
 
@@ -163,7 +135,7 @@
             document.getElementById('staff-menu').style.display = role === 'staff' ? 'block' : 'none';
             show(role === 'admin' ? 'sec-trains' : 'sec-passengers');
             updateUI();
-        } else { alert("Alternative Flow: Login Failed [cite: 2]"); }
+        } else { alert("Login Failed"); }
     }
 
     function show(id) {
@@ -172,50 +144,29 @@
         if(id === 'sec-admin-reports') generateOperationalReport();
     }
 
-    // --- Admin: Trains (UC 2,3,4) ---
     function addUpdateTrain() {
-        const idField = document.getElementById('train_id');
-        const typeField = document.getElementById('train_type');
-        const id = idField.value.trim();
-        const ty = typeField.value.trim();
-        
-        if(!id || !ty) return alert("Alternative Flow: Data Missing [cite: 8]");
-        
+        const id = document.getElementById('train_id').value;
+        const ty = document.getElementById('train_type').value;
+        if(!id || !ty) return;
         const idx = db.trains.findIndex(t => t.id.toLowerCase() === id.toLowerCase());
-        if(idx > -1) {
-            db.trains[idx].type = ty; // UC-3 Update 
-            alert("Postcondition: Train Updated Successfully ");
-        } else {
-            db.trains.push({id, type: ty}); // UC-2 Add [cite: 3]
-            alert("Postcondition: New Train Stored [cite: 3]");
-        }
-        idField.value = ''; typeField.value = '';
+        if(idx > -1) db.trains[idx].type = ty;
+        else db.trains.push({id, type: ty});
         save();
     }
-    function editTrain(id, type) {
-        document.getElementById('train_id').value = id;
-        document.getElementById('train_type').value = type;
-    }
-    function delTrain(id) { db.trains = db.trains.filter(t => t.id !== id); save(); } // UC-4 Delete [cite: 19]
+    function editTrain(id, type) { document.getElementById('train_id').value = id; document.getElementById('train_type').value = type; }
+    function delTrain(id) { db.trains = db.trains.filter(t => t.id !== id); save(); }
 
-    // --- Admin: Routes (UC 5,6,7) ---
     function addUpdateRoute() {
         const p = document.getElementById('route_path').value;
         const idx = document.getElementById('edit_route_idx').value;
-        if(!p) return alert("Alternative Flow: Route Incomplete [cite: 6]");
-        if(idx == -1) db.routes.push(p); // UC-5 Define [cite: 6]
-        else db.routes[idx] = p; // UC-6 Update [cite: 20]
+        if(!p) return;
+        if(idx == -1) db.routes.push(p); else db.routes[idx] = p;
         document.getElementById('edit_route_idx').value = -1;
-        document.getElementById('route_path').value = '';
         save();
     }
-    function editRoute(idx) {
-        document.getElementById('route_path').value = db.routes[idx];
-        document.getElementById('edit_route_idx').value = idx;
-    }
-    function delRoute(idx) { db.routes.splice(idx, 1); save(); } // UC-7 Delete [cite: 21]
+    function editRoute(i) { document.getElementById('route_path').value = db.routes[i]; document.getElementById('edit_route_idx').value = i; }
+    function delRoute(i) { db.routes.splice(i, 1); save(); }
 
-    // --- Admin: Scheduling (UC 8,9,10,11) ---
     function addUpdateSchedule() {
         const sid = document.getElementById('edit_sch_id').value;
         const s = {
@@ -225,97 +176,69 @@
             time: document.getElementById('sch_time').value,
             seats: parseInt(document.getElementById('sch_seats').value)
         };
-        if(sid == -1) db.schedules.push(s); // UC-8/25 Create [cite: 25]
-        else {
-            const index = db.schedules.findIndex(x => x.id == sid);
-            db.schedules[index] = s; // UC-10/23 Update [cite: 23]
-        }
+        if(sid == -1) db.schedules.push(s); else db.schedules[db.schedules.findIndex(x => x.id == sid)] = s;
         document.getElementById('edit_sch_id').value = -1;
         save();
     }
-    function editSch(id) {
-        const s = db.schedules.find(x => x.id == id);
-        document.getElementById('edit_sch_id').value = s.id;
-        document.getElementById('sch_train').value = s.train;
-        document.getElementById('sch_route').value = s.route;
-        document.getElementById('sch_time').value = s.time;
-        document.getElementById('sch_seats').value = s.seats;
-    }
-    function delSch(id) { db.schedules = db.schedules.filter(s => s.id !== id); save(); } // UC-11/24 Delete [cite: 24]
+    function editSch(id) { const s = db.schedules.find(x => x.id == id); document.getElementById('edit_sch_id').value = s.id; document.getElementById('sch_train').value = s.train; document.getElementById('sch_route').value = s.route; document.getElementById('sch_time').value = s.time; document.getElementById('sch_seats').value = s.seats; }
+    function delSch(id) { db.schedules = db.schedules.filter(s => s.id !== id); save(); }
 
-    // --- Staff: Passengers (UC 13,14,15) ---
-    function savePassenger() {
-        const id = document.getElementById('ps_id').value;
-        const name = document.getElementById('ps_name').value;
-        if(id.length < 5) return alert("Alternative Flow: ID Invalid [cite: 12, 13]"); // UC-14 Validate [cite: 13]
-        db.passengers.push({name, id}); // UC-13 Create [cite: 10]
-        save();
-    }
-    function searchPS() {
-        const q = document.getElementById('ps_search').value.toLowerCase();
-        // UC-15 Search by Name or ID 
-        const rows = db.passengers.filter(p => p.name.toLowerCase().includes(q) || p.id.toString().includes(q));
-        renderTable('psList', rows.map(r => `<tr><td>${r.name}</td><td>${r.id}</td></tr>`));
-    }
-
-    // --- Staff: Ticketing (UC 16-19) ---
-    function checkAvail() {
-        const sid = document.getElementById('tk_trip').value;
-        const sch = db.schedules.find(s => s.id == sid);
-        // UC-16 Check Availability [cite: 15]
-        document.getElementById('avail_info').innerText = sch ? `Current Seats Available: ${sch.seats}` : "";
-    }
-    function issueTicket() {
-        const sid = document.getElementById('tk_trip').value;
-        const p = document.getElementById('tk_passenger').value;
-        const sch = db.schedules.find(s => s.id == sid);
-        if(sch && sch.seats > 0) {
-            sch.seats--; // UC-17 Seat Allocation [cite: 14]
-            db.tickets.push({p, trip: sch.route, sid: sid, id: Date.now()}); // UC-18 Issue [cite: 26]
-            save();
-            alert("Ticket Issued Successfully [cite: 26]");
-        } else { alert("Alternative Flow: Trip Full [cite: 14]"); }
-    }
-    function cancelTicket(id, sid) {
-        db.tickets = db.tickets.filter(t => t.id !== id);
-        const sch = db.schedules.find(s => s.id == sid);
-        if(sch) sch.seats++; // UC-19 Cancel [cite: 28]
-        save();
-    }
-
-    // --- UC-12: Generate Reports  ---
+    // --- التعديل المطلوب في التقارير (إزالة Sales و Users) ---
     function generateOperationalReport() {
-        document.getElementById('report-content').innerHTML = `
-            <div class="report-grid">
-                <div class="card" style="background:#2c3e50"><h4>Fleet</h4><p>${db.trains.length} Trains</p></div>
-                <div class="card" style="background:#27ae60"><h4>Trips</h4><p>${db.schedules.length} Routes</p></div>
-                <div class="card" style="background:#2980b9"><h4>Users</h4><p>${db.passengers.length} Registered</p></div>
-                <div class="card" style="background:#e67e22"><h4>Sales</h4><p>${db.tickets.length} Issued</p></div>
-            </div>`;
+        const target = document.getElementById('report-content');
+        target.innerHTML = `
+            <div style="margin-bottom:20px;">
+                <p>Select Operational Report:</p>
+                <button onclick="processReport('Fleet')" style="width:auto; padding:8px 15px; margin-right:10px;">Fleet Summary</button>
+                <button onclick="processReport('Schedule')" style="width:auto; padding:8px 15px;">Schedule Analysis</button>
+            </div>
+            <div id="report-display-area" style="min-height:150px; border:1px dashed #ccc; padding:20px; border-radius:10px;">
+                <p style="color:#999;">Select a category to retrieve data...</p>
+            </div>
+        `;
     }
 
-    function save() { 
-        localStorage.setItem('train_final_system_db', JSON.stringify(db)); 
-        updateUI(); 
+    function processReport(type) {
+        const display = document.getElementById('report-display-area');
+        display.innerHTML = `<p style="color:#3498db;">System retrieving data...</p>`;
+        
+        setTimeout(() => {
+            if(type === 'Fleet') {
+                display.innerHTML = `
+                    <div class="report-grid">
+                        <div class="card" style="background:#2c3e50"><h4>Total Trains Registered</h4><p>${db.trains.length}</p></div>
+                        <div class="card" style="background:#34495e"><h4>Configured Routes</h4><p>${db.routes.length}</p></div>
+                    </div>`;
+            } else {
+                display.innerHTML = `
+                    <div class="report-grid">
+                        <div class="card" style="background:#27ae60"><h4>Active Schedules</h4><p>${db.schedules.length}</p></div>
+                        <div class="card" style="background:#2980b9"><h4>Available Capacity</h4><p>${db.schedules.reduce((acc, s) => acc + s.seats, 0)} Seats</p></div>
+                    </div>`;
+            }
+        }, 600);
     }
-    
-    function renderTable(id, html) { 
-        document.querySelector(`#${id} tbody`).innerHTML = html.join(''); 
-    }
+
+    function savePassenger() { db.passengers.push({name: document.getElementById('ps_name').value, id: document.getElementById('ps_id').value}); save(); }
+    function searchPS() { const q = document.getElementById('ps_search').value.toLowerCase(); renderTable('psList', db.passengers.filter(p => p.name.toLowerCase().includes(q) || p.id.includes(q)).map(r => `<tr><td>${r.name}</td><td>${r.id}</td></tr>`)); }
+    function checkAvail() { const s = db.schedules.find(x => x.id == document.getElementById('tk_trip').value); document.getElementById('avail_info').innerText = s ? `Seats: ${s.seats}` : ""; }
+    function issueTicket() { const s = db.schedules.find(x => x.id == document.getElementById('tk_trip').value); if(s && s.seats > 0) { s.seats--; db.tickets.push({p: document.getElementById('tk_passenger').value, trip: s.route, sid: s.id, id: Date.now()}); save(); } }
+    function cancelTicket(id, sid) { db.tickets = db.tickets.filter(t => t.id !== id); const s = db.schedules.find(x => x.id == sid); if(s) s.seats++; save(); }
+
+    function save() { localStorage.setItem('train_final_db', JSON.stringify(db)); updateUI(); }
+    function renderTable(id, html) { document.querySelector(`#${id} tbody`).innerHTML = html.join(''); }
 
     function updateUI() {
-        renderTable('trainList', db.trains.map(t => `<tr><td>${t.id}</td><td>${t.type}</td><td><button class="action-btn upd-btn" onclick="editTrain('${t.id}','${t.type}')">Update (UC-3)</button><button class="action-btn del-btn" onclick="delTrain('${t.id}')">Delete</button></td></tr>`));
-        renderTable('routeList', db.routes.map((r, i) => `<tr><td>${r}</td><td><button class="action-btn upd-btn" onclick="editRoute(${i})">Update (UC-6)</button><button class="action-btn del-btn" onclick="delRoute(${i})">Delete</button></td></tr>`));
-        renderTable('schList', db.schedules.map(s => `<tr><td>${s.train}</td><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td><td><button class="action-btn upd-btn" onclick="editSch(${s.id})">Update (UC-10)</button><button class="action-btn del-btn" onclick="delSch(${s.id})">Delete</button></td></tr>`));
+        renderTable('trainList', db.trains.map(t => `<tr><td>${t.id}</td><td>${t.type}</td><td><button class="action-btn upd-btn" onclick="editTrain('${t.id}','${t.type}')">Update</button><button class="action-btn del-btn" onclick="delTrain('${t.id}')">Delete</button></td></tr>`));
+        renderTable('routeList', db.routes.map((r, i) => `<tr><td>${r}</td><td><button class="action-btn upd-btn" onclick="editRoute(${i})">Update</button><button class="action-btn del-btn" onclick="delRoute(${i})">Delete</button></td></tr>`));
+        renderTable('schList', db.schedules.map(s => `<tr><td>${s.train}</td><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td><td><button class="action-btn upd-btn" onclick="editSch(${s.id})">Update</button><button class="action-btn del-btn" onclick="delSch(${s.id})">Delete</button></td></tr>`));
         renderTable('psList', db.passengers.map(p => `<tr><td>${p.name}</td><td>${p.id}</td></tr>`));
-        renderTable('tkTable', db.tickets.map(t => `<tr><td>${t.p}</td><td>${t.trip}</td><td><button class="action-btn del-btn" onclick="cancelTicket(${t.id}, ${t.sid})">Cancel (UC-19)</button></td></tr>`));
-        // UC-20 View Daily Schedule [cite: 16]
+        renderTable('tkTable', db.tickets.map(t => `<tr><td>${t.p}</td><td>${t.trip}</td><td><button class="action-btn del-btn" onclick="cancelTicket(${t.id}, ${t.sid})">Cancel</button></td></tr>`));
         renderTable('dailyView', db.schedules.map(s => `<tr><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td></tr>`));
-        
         document.getElementById('sch_train').innerHTML = db.trains.map(t => `<option>${t.id}</option>`).join('');
         document.getElementById('sch_route').innerHTML = db.routes.map(r => `<option>${r}</option>`).join('');
         document.getElementById('tk_passenger').innerHTML = db.passengers.map(p => `<option>${p.name}</option>`).join('');
-        document.getElementById('tk_trip').innerHTML = db.schedules.map(s => `<option value="${s.id}">${s.route} (${s.time})</option>`).join('');
+        document.getElementById('tk_trip').innerHTML = db.schedules.map(s => `<option value="${s.id}">${s.route}</option>`).join('');
     }
 </script>
 </body>
