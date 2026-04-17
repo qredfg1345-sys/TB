@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Train System | Final Integrated 20 Use Cases</title>
+    <title>Train System | Final 20 Use Cases (With Update Function)</title>
     <style>
         :root { --admin-bg: #1a252f; --staff-bg: #27ae60; --light-bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -29,7 +29,8 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #f8f9fa; color: #333; }
-        .action-btn { width: auto; padding: 5px 10px; font-size: 12px; margin: 2px; background: #e67e22; }
+        .action-btn { width: auto; padding: 5px 10px; font-size: 11px; margin: 2px; }
+        .upd-btn { background: #3498db; }
         .del-btn { background: #e74c3c; }
         
         /* Login Overlay */
@@ -46,43 +47,40 @@
 <div id="login-overlay">
     <div class="login-box">
         <h2 style="color:#2c3e50">Train System Login</h2>
-        <p style="font-size:12px; color:#666">Select role and enter credentials</p>
         <select id="role-select">
             <option value="admin">Administrator (UC-1)</option>
             <option value="staff">Staff Member</option>
         </select>
         <input type="text" id="user" placeholder="Username">
         <input type="password" id="pass" placeholder="Password">
-        <button onclick="handleLogin()">Access Portal (UC-1) </button>
+        <button onclick="handleLogin()">Access Portal</button>
         <p style="font-size: 11px; color: #999; margin-top: 15px;">Admin: admin/admin | Staff: staff/staff</p>
     </div>
 </div>
 
 <div class="sidebar" id="sidebar" style="display:none;">
     <h2 id="portal-name">Portal</h2>
-    
     <div id="admin-menu">
         <div class="menu-group">
-            <span class="menu-title">Fleet Management</span>
-            <div class="nav-link active" onclick="show('sec-trains')">Trains (UC 2,3,4) </div>
+            <span class="menu-title">Fleet Mgt</span>
+            <div class="nav-link active" onclick="show('sec-trains')">Trains (UC 2,3,4)</div>
         </div>
         <div class="menu-group">
             <span class="menu-title">Route Mgt</span>
-            <div class="nav-link" onclick="show('sec-routes')">Define Routes (UC 5,6,7) </div>
+            <div class="nav-link" onclick="show('sec-routes')">Routes (UC 5,6,7)</div>
         </div>
         <div class="menu-group">
-            <span class="menu-title">System Operations</span>
-            <div class="nav-link" onclick="show('sec-schedules')">Schedules (UC 8,9,10,11) </div>
-            <div class="nav-link" onclick="show('sec-admin-reports')">Reports (UC-12) </div>
+            <span class="menu-title">Operations</span>
+            <div class="nav-link" onclick="show('sec-schedules')">Schedules (UC 8,9,10,11)</div>
+            <div class="nav-link" onclick="show('sec-admin-reports')">Reports (UC-12)</div>
         </div>
     </div>
-
     <div id="staff-menu" style="display:none;">
         <div class="menu-group">
-            <span class="menu-title">Staff Operations</span>
-            <div class="nav-link" onclick="show('sec-passengers')">Passengers (UC 13,14,15) [cite: 10, 13, 29]</div>
-            <div class="nav-link" onclick="show('sec-tickets')">Ticketing (UC 16,17,18,19) </div>
-            <div class="nav-link" onclick="show('sec-daily')">Daily Schedule (UC-20) </div>
+            <span class="menu-title">Staff</span>
+            <div class="nav-link" onclick="show('sec-passengers')">Passengers (UC 13,14,15)</div>
+            <div class="nav-link" onclick="show('sec-tickets')">Ticketing (UC 16-19)</div>
+            <div class="nav-link" onclick="show('sec-daily')">Daily View (UC-20)</div>
         </div>
     </div>
 </div>
@@ -91,83 +89,81 @@
     <button class="logout" onclick="location.reload()">Logout</button>
 
     <section id="sec-trains" class="container active">
-        <h3>Train Management (UC 2,3,4)</h3>
+        <h3>Train Management (Add/Update/Delete)</h3>
         <input type="text" id="train_id" placeholder="Train ID">
         <input type="text" id="train_type" placeholder="Train Type">
-        <button onclick="addUpdateTrain()">Save Train Asset [cite: 3]</button>
+        <button onclick="addUpdateTrain()">Save Train Asset (UC 2/3)</button>
         <table id="trainList"><thead><tr><th>ID</th><th>Type</th><th>Actions</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-routes" class="container">
-        <h3>Route Configuration (UC 5,6,7)</h3>
-        <input type="text" id="route_path" placeholder="Route Path (e.g. Riyadh-Makkah)">
-        <button onclick="addUpdateRoute()">Define & Store Route [cite: 6]</button>
+        <h3>Route Configuration (Define/Update/Delete)</h3>
+        <input type="hidden" id="edit_route_idx" value="-1">
+        <input type="text" id="route_path" placeholder="Route Path (e.g. Riyadh-Dammam)">
+        <button onclick="addUpdateRoute()">Save Route (UC 5/6)</button>
         <table id="routeList"><thead><tr><th>Route Path</th><th>Actions</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-schedules" class="container">
-        <h3>Scheduling & Conflict Check (UC 8,9,10,11)</h3>
+        <h3>Schedule Operations (Create/Update/Delete)</h3>
+        <input type="hidden" id="edit_sch_id" value="-1">
         <select id="sch_train"></select>
         <select id="sch_route"></select>
         <input type="datetime-local" id="sch_time">
-        <input type="number" id="sch_seats" placeholder="Max Seat Allocation">
-        <button onclick="addUpdateSchedule()">Commit Schedule [cite: 7]</button>
+        <input type="number" id="sch_seats" placeholder="Max Seats">
+        <button onclick="addUpdateSchedule()">Commit Schedule (UC 8/10)</button>
         <table id="schList"><thead><tr><th>Train</th><th>Route</th><th>Time</th><th>Seats</th><th>Actions</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-admin-reports" class="container">
-        <h3>Operational Reports (UC-12)</h3>
+        <h3>System Operational Reports (UC-12)</h3>
         <div id="report-content"></div>
     </section>
 
     <section id="sec-passengers" class="container">
         <h3>Passenger Registry (UC 13,14,15)</h3>
-        <input type="text" id="ps_name" placeholder="Passenger Full Name">
-        <input type="text" id="ps_id" placeholder="National ID (Min 5 digits)">
-        <button onclick="savePassenger()" style="background:#27ae60">Validate & Create Profile [cite: 10, 12, 13]</button>
+        <input type="text" id="ps_name" placeholder="Name">
+        <input type="text" id="ps_id" placeholder="ID (Min 5 digits)">
+        <button onclick="savePassenger()" style="background:var(--staff-bg)">Create Profile</button>
         <hr>
-        <input type="text" id="ps_search" onkeyup="searchPS()" placeholder="Search by Name or ID (UC-15)[cite: 29]...">
-        <table id="psList"><thead><tr><th>Name</th><th>ID (Validated)</th></tr></thead><tbody></tbody></table>
+        <input type="text" id="ps_search" onkeyup="searchPS()" placeholder="Search by Name or ID...">
+        <table id="psList"><thead><tr><th>Name</th><th>ID</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-tickets" class="container">
-        <h3>Ticket Issuance & Seat Allocation (UC 16,17,18,19)</h3>
+        <h3>Ticketing & Seat Allocation (UC 16-19)</h3>
         <select id="tk_passenger"></select>
         <select id="tk_trip" onchange="checkAvail()"></select>
-        <div id="avail_info" style="padding:10px; font-weight:bold; color:#27ae60"></div>
-        <button onclick="issueTicket()" style="background:#27ae60">Confirm & Issue Ticket (UC-18) [cite: 26]</button>
-        <h4 style="margin-top:30px;">Active Reservations (Cancel UC-19) [cite: 28]</h4>
+        <div id="avail_info"></div>
+        <button onclick="issueTicket()" style="background:var(--staff-bg)">Issue Ticket</button>
         <table id="tkTable"><thead><tr><th>Passenger</th><th>Trip</th><th>Actions</th></tr></thead><tbody></tbody></table>
     </section>
 
     <section id="sec-daily" class="container">
-        <h3>View Daily Schedule (UC-20)</h3>
-        <table id="dailyView"><thead><tr><th>Trip</th><th>Departure Time</th><th>Availability (UC-16)</th></tr></thead><tbody></tbody></table>
+        <h3>Daily Schedule View (UC-20)</h3>
+        <table id="dailyView"><thead><tr><th>Trip</th><th>Time</th><th>Seats</th></tr></thead><tbody></tbody></table>
     </section>
 </div>
 
 <script>
-    // System Local Database Initialization
-    let db = JSON.parse(localStorage.getItem('full_20uc_db')) || {
+    let db = JSON.parse(localStorage.getItem('final_train_system_db')) || {
         trains: [], routes: [], schedules: [], passengers: [], tickets: []
     };
 
-    // UC-1: Admin Login Flow 
     function handleLogin() {
         const role = document.getElementById('role-select').value;
         const u = document.getElementById('user').value;
         const p = document.getElementById('pass').value;
-        
         if((role === 'admin' && u === 'admin' && p === 'admin') || (role === 'staff' && u === 'staff' && p === 'staff')) {
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('main').style.display = 'block';
-            document.getElementById('portal-name').innerText = role === 'admin' ? 'Administrator Portal' : 'Staff Portal';
+            document.getElementById('portal-name').innerText = role === 'admin' ? 'Admin Portal' : 'Staff Portal';
             document.getElementById('admin-menu').style.display = role === 'admin' ? 'block' : 'none';
             document.getElementById('staff-menu').style.display = role === 'staff' ? 'block' : 'none';
             show(role === 'admin' ? 'sec-trains' : 'sec-passengers');
             updateUI();
-        } else { alert("Login Failed: Invalid Credentials "); }
+        } else { alert("Login Failed"); }
     }
 
     function show(id) {
@@ -176,111 +172,121 @@
         if(id === 'sec-admin-reports') generateOperationalReport();
     }
 
-    // --- Admin Operations: Trains (UC 2,3,4)  ---
+    // --- Admin: Trains (UC 2,3,4) ---
     function addUpdateTrain() {
         const id = document.getElementById('train_id').value;
         const ty = document.getElementById('train_type').value;
-        if(!id || !ty) return alert("Fill all fields [cite: 8]");
+        if(!id || !ty) return alert("Fill all fields");
         const idx = db.trains.findIndex(t => t.id === id);
-        if(idx > -1) db.trains[idx].type = ty; // UC-3 Update
-        else db.trains.push({id, type: ty}); // UC-2 Add
+        if(idx > -1) db.trains[idx].type = ty; // Update Logic (UC-3)
+        else db.trains.push({id, type: ty}); // Add Logic (UC-2)
         save();
     }
-    function delTrain(id) { db.trains = db.trains.filter(t => t.id !== id); save(); } // UC-4 Delete
+    function editTrain(id, type) {
+        document.getElementById('train_id').value = id;
+        document.getElementById('train_type').value = type;
+    }
+    function delTrain(id) { db.trains = db.trains.filter(t => t.id !== id); save(); }
 
-    // --- Admin Operations: Routes (UC 5,6,7)  ---
+    // --- Admin: Routes (UC 5,6,7) ---
     function addUpdateRoute() {
         const p = document.getElementById('route_path').value;
-        if(p) { db.routes.push(p); save(); } // UC-5/6
+        const idx = document.getElementById('edit_route_idx').value;
+        if(!p) return;
+        if(idx == -1) db.routes.push(p); // Add (UC-5)
+        else db.routes[idx] = p; // Update (UC-6)
+        document.getElementById('edit_route_idx').value = -1;
+        save();
     }
-    function delRoute(idx) { db.routes.splice(idx, 1); save(); } // UC-7 Delete
+    function editRoute(idx) {
+        document.getElementById('route_path').value = db.routes[idx];
+        document.getElementById('edit_route_idx').value = idx;
+    }
+    function delRoute(idx) { db.routes.splice(idx, 1); save(); }
 
-    // --- Admin Operations: Scheduling (UC 8,9,10,11)  ---
+    // --- Admin: Scheduling (UC 8,9,10,11) ---
     function addUpdateSchedule() {
+        const sid = document.getElementById('edit_sch_id').value;
         const s = {
-            id: Date.now(),
+            id: sid == -1 ? Date.now() : parseInt(sid),
             train: document.getElementById('sch_train').value,
             route: document.getElementById('sch_route').value,
             time: document.getElementById('sch_time').value,
             seats: parseInt(document.getElementById('sch_seats').value)
         };
-        db.schedules.push(s); // UC-8/25 Create
+        if(sid == -1) db.schedules.push(s); // Create (UC-8)
+        else {
+            const index = db.schedules.findIndex(x => x.id == sid);
+            db.schedules[index] = s; // Update (UC-10)
+        }
+        document.getElementById('edit_sch_id').value = -1;
         save();
     }
-    function delSch(id) { db.schedules = db.schedules.filter(s => s.id !== id); save(); } // UC-11/24 Delete
+    function editSch(id) {
+        const s = db.schedules.find(x => x.id == id);
+        document.getElementById('edit_sch_id').value = s.id;
+        document.getElementById('sch_train').value = s.train;
+        document.getElementById('sch_route').value = s.route;
+        document.getElementById('sch_time').value = s.time;
+        document.getElementById('sch_seats').value = s.seats;
+    }
+    function delSch(id) { db.schedules = db.schedules.filter(s => s.id !== id); save(); }
 
-    // --- Staff Operations: Passengers (UC 13,14,15) [cite: 10, 13, 29] ---
+    // --- Staff: Passengers & Tickets ---
     function savePassenger() {
         const id = document.getElementById('ps_id').value;
         const name = document.getElementById('ps_name').value;
-        if(id.length < 5) return alert("UC-14: ID Rejected - Invalid Format [cite: 12]"); // UC-14 Validate
-        db.passengers.push({name, id}); // UC-13 Create
+        if(id.length < 5) return alert("UC-14: Invalid ID");
+        db.passengers.push({name, id});
         save();
     }
-
-    // UC-15: Passenger Search Logic - Search by Name or ID [cite: 29]
     function searchPS() {
         const q = document.getElementById('ps_search').value.toLowerCase();
-        const rows = db.passengers.filter(p => 
-            p.name.toLowerCase().includes(q) || 
-            p.id.toString().includes(q)
-        );
+        const rows = db.passengers.filter(p => p.name.toLowerCase().includes(q) || p.id.toString().includes(q));
         renderTable('psList', rows.map(r => `<tr><td>${r.name}</td><td>${r.id}</td></tr>`));
     }
-
-    // --- Staff Operations: Ticketing (UC 16,17,18,19)  ---
     function checkAvail() {
         const sid = document.getElementById('tk_trip').value;
         const sch = db.schedules.find(s => s.id == sid);
-        document.getElementById('avail_info').innerText = sch ? `UC-16 Current Availability: ${sch.seats} Seats [cite: 15]` : "";
+        document.getElementById('avail_info').innerText = sch ? `Available: ${sch.seats} Seats` : "";
     }
     function issueTicket() {
         const sid = document.getElementById('tk_trip').value;
         const p = document.getElementById('tk_passenger').value;
         const sch = db.schedules.find(s => s.id == sid);
         if(sch && sch.seats > 0) {
-            sch.seats--; // UC-17 Seat Allocation [cite: 14]
-            db.tickets.push({p, trip: sch.route, sid: sid, id: Date.now()}); // UC-18 Issue [cite: 26]
+            sch.seats--;
+            db.tickets.push({p, trip: sch.route, sid: sid, id: Date.now()});
             save();
-            alert("Ticket Generated Successfully [cite: 26]");
-        } else { alert("Trip Full (Alternative Flow) [cite: 14, 26]"); }
+        }
     }
     function cancelTicket(id, sid) {
         db.tickets = db.tickets.filter(t => t.id !== id);
         const sch = db.schedules.find(s => s.id == sid);
-        if(sch) sch.seats++; // UC-19 Cancel [cite: 28]
+        if(sch) sch.seats++;
         save();
     }
 
-    // --- UC-12: Generate Operational Reports  ---
     function generateOperationalReport() {
-        const target = document.getElementById('report-content');
-        target.innerHTML = `
+        document.getElementById('report-content').innerHTML = `
             <div class="report-grid">
-                <div class="card" style="background:#2c3e50"><h4>Total Fleet</h4><p>${db.trains.length} Trains</p></div>
-                <div class="card" style="background:#27ae60"><h4>Active Trips</h4><p>${db.schedules.length} Routes</p></div>
-                <div class="card" style="background:#2980b9"><h4>Registered Passengers</h4><p>${db.passengers.length} Profiles</p></div>
-                <div class="card" style="background:#e67e22"><h4>Tickets Sold</h4><p>${db.tickets.length} Sales</p></div>
-            </div>
-        `;
+                <div class="card" style="background:#2c3e50"><h4>Fleet</h4><p>${db.trains.length}</p></div>
+                <div class="card" style="background:#27ae60"><h4>Trips</h4><p>${db.schedules.length}</p></div>
+                <div class="card" style="background:#2980b9"><h4>Users</h4><p>${db.passengers.length}</p></div>
+                <div class="card" style="background:#e67e22"><h4>Sales</h4><p>${db.tickets.length}</p></div>
+            </div>`;
     }
 
-    // --- Persistence & UI Synchronization ---
-    function save() { 
-        localStorage.setItem('full_20uc_db', JSON.stringify(db)); 
-        updateUI(); 
-    }
-    function renderTable(id, html) { 
-        document.querySelector(`#${id} tbody`).innerHTML = html.join(''); 
-    }
+    function save() { localStorage.setItem('final_train_system_db', JSON.stringify(db)); updateUI(); }
+    function renderTable(id, html) { document.querySelector(`#${id} tbody`).innerHTML = html.join(''); }
 
     function updateUI() {
-        renderTable('trainList', db.trains.map(t => `<tr><td>${t.id}</td><td>${t.type}</td><td><button class="action-btn del-btn" onclick="delTrain('${t.id}')">Delete (UC-4)</button></td></tr>`));
-        renderTable('routeList', db.routes.map((r, i) => `<tr><td>${r}</td><td><button class="action-btn del-btn" onclick="delRoute(${i})">Delete (UC-7)</button></td></tr>`));
-        renderTable('schList', db.schedules.map(s => `<tr><td>${s.train}</td><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td><td><button class="action-btn del-btn" onclick="delSch(${s.id})">Delete (UC-11)</button></td></tr>`));
+        renderTable('trainList', db.trains.map(t => `<tr><td>${t.id}</td><td>${t.type}</td><td><button class="action-btn upd-btn" onclick="editTrain('${t.id}','${t.type}')">Update (UC-3)</button><button class="action-btn del-btn" onclick="delTrain('${t.id}')">Delete</button></td></tr>`));
+        renderTable('routeList', db.routes.map((r, i) => `<tr><td>${r}</td><td><button class="action-btn upd-btn" onclick="editRoute(${i})">Update (UC-6)</button><button class="action-btn del-btn" onclick="delRoute(${i})">Delete</button></td></tr>`));
+        renderTable('schList', db.schedules.map(s => `<tr><td>${s.train}</td><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td><td><button class="action-btn upd-btn" onclick="editSch(${s.id})">Update (UC-10)</button><button class="action-btn del-btn" onclick="delSch(${s.id})">Delete</button></td></tr>`));
         renderTable('psList', db.passengers.map(p => `<tr><td>${p.name}</td><td>${p.id}</td></tr>`));
-        renderTable('tkTable', db.tickets.map(t => `<tr><td>${t.p}</td><td>${t.trip}</td><td><button class="action-btn del-btn" onclick="cancelTicket(${t.id}, ${t.sid})">Cancel (UC-19)</button></td></tr>`));
-        renderTable('dailyView', db.schedules.map(s => `<tr><td>${s.route}</td><td>${s.time}</td><td>${s.seats > 0 ? s.seats + ' Seats' : 'FULL'}</td></tr>`));
+        renderTable('tkTable', db.tickets.map(t => `<tr><td>${t.p}</td><td>${t.trip}</td><td><button class="action-btn del-btn" onclick="cancelTicket(${t.id}, ${t.sid})">Cancel</button></td></tr>`));
+        renderTable('dailyView', db.schedules.map(s => `<tr><td>${s.route}</td><td>${s.time}</td><td>${s.seats}</td></tr>`));
         
         document.getElementById('sch_train').innerHTML = db.trains.map(t => `<option>${t.id}</option>`).join('');
         document.getElementById('sch_route').innerHTML = db.routes.map(r => `<option>${r}</option>`).join('');
