@@ -1,0 +1,19 @@
+# المجلدات الضخمة
+node_modules/
+dist/
+build/
+
+# ملفات السرية والبيئة
+.env
+.env.local
+*.local
+
+# ملفات النظام وإعدادات المحرر الشخصية
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ملفات السجلات والأخطاء
+*.log
+npm-debug.log*
